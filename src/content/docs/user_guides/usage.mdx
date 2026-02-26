@@ -6,13 +6,17 @@ description: How to use sf-tractomics
 import CommandOutputs from '../../../components/CommandOutputs.astro';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { FileTree } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
 ![sf-tractomics pipeline schema](../../../assets/sf-tractomics-schema.png)
 
 ## **Choosing a profile**
 
 Some `sf-tractomics` core functionalities are accessed and selected using profiles and arguments.
+
+<Aside type="caution">
+   We highly recommend the use of Docker or Singularity containers (via the `docker` or `apptainer` profiles) for full pipeline reproducibility, however when this is not possible, Conda is also supported.
+</Aside>
 
 **Processing profiles**:
 
@@ -135,7 +139,7 @@ Note that the pipeline will create the following files in your working directory
   * ...                             # Other nextflow related files
 </FileTree>
 
-## **Using the params.yml file**
+## **Configuration file**
 
 If you wish to repeatedly use the same parameters for multiple runs, rather than specifying each flag in the command, you can specify these in a params file.
 
@@ -198,10 +202,6 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 
 Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity,
 and Apptainer) - see below.
-
-:::caution[Important!]
-We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
-:::
 
 The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making
 multiple config profiles for various institutional clusters available at run time. For more information and to check if your system is supported, please

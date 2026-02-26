@@ -1,0 +1,25 @@
+---
+title: Troubleshooting
+description: Common issues encountered when interacting with the pipeline.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Local tracking or EDDY correction error when running with the GPU option
+- Make sure you have a CUDA enabled GPU. At the moment, other GPU types (e.g. AMD) are not supported.
+- Update your CUDA drivers to the latest version. Some CUDA versions interfere with the GPU implementation of some modules. Upgrading to the latest version should fix the issue. If you're using a cluster, you might simply want to run on CPU nodes instead. Otherwise, feel free to open an issue so we can address the issue as quickly as possible.
+- In the meantime, you can always run the pipeline without the GPU profile which will only make the pipeline run slightly slower.
+
+## Process requirement exceeds available CPUs
+If your system has enough required CPUs for the task, you might want to make sure that the number of processors available to Nextflow is not limited by your system. Some administrators set a limit on that number via the `NXF_OPTS` environment variable. You can set that limit yourself like the following (with your desired CPU count):
+
+```bash
+export NXF_OPTS="-XX:ActiveProcessorCount=<desired_cpu_count> -Xmx2g
+```
+
+<Aside>
+You might encounter this error because you're trying to start the pipeline directly from a compute node which we recommend avoiding. We instead recommend to run the pipeline directly from a login node. The `slurm` executor should take care of automatically submitting the jobs on the cluster with appropriate resources allocations. Please refer to [this section](/sf-tractomics/user_guides/nointernet) to learn more about running the pipeline with the SLURM executor.
+</Aside>
+
+

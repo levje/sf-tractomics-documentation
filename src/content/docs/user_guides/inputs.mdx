@@ -5,6 +5,7 @@ description: sf-tractomics inputs
 
 import { FileTree } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
 ### Default input format - BIDS
 
@@ -33,6 +34,10 @@ that minimally contains **diffusion** (**dwi**) and **T1-weighted** (**T1w**) MR
         * sub-02\_T1w.nii.gz
         * sub-02\_T1w.json
 </FileTree>
+
+<Aside type="tip">
+  The [BIDS](https://bids-specification.readthedocs.io/en/stable/) specification is quite exhaustive which might be hard to digest for a new user. If you need to convert and structure your data in the BIDS structure, we suggest using a tool such as [dcm2bids](https://unfmontreal.github.io/Dcm2Bids/3.2.0/) to assist you in converting and structuring your data efficiently. If you want to avoid structuring your data this way, please see the section below where you can input a custom spreadsheet that specifies to the pipeline where to find the data.
+</Aside>
 
 ### Perform Motion and Eddy currents correction
 

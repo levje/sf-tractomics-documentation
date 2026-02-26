@@ -1,20 +1,21 @@
 ---
-title: How to run sf-tractomics?
-description: Installation 
+title: Installation
+description: Install the pipeline
 ---
 
 import { Steps } from '@astrojs/starlight/components';
 import CommandOutputs from '../../../components/CommandOutputs.astro';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-### **Prerequisites**
+## Prerequisites
 
 While you do not need to install every software used within `sf-tractomics`, there is two core dependencies that need to be available at runtime:
 
 <Steps>
-  1. **Nextflow (>= 24.10.5)**
+  1. **Nextflow (>= 25.04.6)**
 
-     To install the `nextflow` executable, please refer to the [official `nextflow` documentation](https://www.nextflow.io/docs/latest/install.html). While `sf-tractomics` has a minimal `nextflow` version, it is always tested against the latest version available (and oldest), so you can go ahead and install the latest version available. If you plan on running the pipeline on an HPC server, you might want to validate it is not already installed by your server's admins.
+     To install the `nextflow` executable, please refer to the [official nextflow documentation](https://www.nextflow.io/docs/latest/install.html). While `sf-tractomics` has a minimal `nextflow` version, it is always tested against the latest version available, so you can go ahead and install the latest version available. If you plan on running the pipeline on an HPC server, you might want to validate it is not already installed by your server's admins.
 
      **To validate `nextflow` is installed, you can run the following command:**
 
@@ -30,21 +31,21 @@ While you do not need to install every software used within `sf-tractomics`, the
          (english, french, italian, spanish) !
 
          ```bash
-         N E X T F L O W   ~  version 24.10.4
+          N E X T F L O W   ~  version 25.04.6
 
-         Pulling nextflow-io/helloworld ...
-         downloaded from https://github.com/nextflow-io/hello.git
-         Launching `https://github.com/nextflow-io/helloworld` [disturbed_mahavira] DSL2 - revision: afff16a9b4 [master]
+          Pulling nextflow-io/helloworld ...
+          downloaded from https://github.com/nextflow-io/hello.git
+          Launching `https://github.com/nextflow-io/helloworld` [special_newton] DSL2 - revision: d828daeef7 [master]
 
-         executor >  local (4)
-         [59/71fa40] process > sayHello (4) [100%] 4 of 4 ✔
-         Bonjour world!
+          executor >  local (4)
+          [cf/67aeba] sayHello (1) [100%] 4 of 4 ✔
+          Ciao world!
 
-         Hello world!
+          Hola world!
 
-         Ciao world!
+          Bonjour world!
 
-         Hola world!
+          Hello world!
          ```
        </span>
      </CommandOutputs>
@@ -179,7 +180,8 @@ While you do not need to install every software used within `sf-tractomics`, the
           </CommandOutputs>
      </Steps>
 </Steps>
-### **Install sf-tractomics**
+
+## Install sf-tractomics for online use
      <Steps>
        1. **Release**
 
@@ -269,5 +271,144 @@ While you do not need to install every software used within `sf-tractomics`, the
           </CommandOutputs>
      </Steps>
 
+## Install the pipeline for offline use
 
-Once everything installed and/or available, you can proceed to the [inputs section](/sf-tractomics/0.1.0/guides/inputs).
+Some computing nodes does not have access to internet at runtime. Since the pipeline interacts with the containers repository and pull during execution, it won’t work if the compute nodes do not have access to the internet. Fortunately, containers can be downloaded prior to the pipeline execution, and fetch locally during runtime. Here are a few steps to perform to get all of that working quickly:
+
+<Steps>
+  1. **(Recommended)** Point the `NXF_HOME` environment variable in your scratch directory. When pulling or running a pipeline by only specifying its name
+     ```bash
+     export NXF_HOME=/scratch/${USER}/.nextflow
+     ```
+  2. Create a directory where to host your apptainer images and a cache directory. For example:
+     ```bash
+     mkdir /scratch/${USER}/sf-tractomics-containers
+     mkdir /scratch/${USER}/sf-tractomics-containers/cache
+     ```
+     Feel free to change the directories location to fit your needs.
+  3. Download the apptainer images
+     <Aside type="caution">
+      In order for the download command to work, `nextflow` and `apptainer`/`singularity` need to be available on PATH.
+     </Aside>
+     <details open>
+     <summary>Download with script</summary>
+     ```bash
+      curl -fsSL https://raw.githubusercontent.com/nf-neuro/modules/refs/heads/main/assets/download_pipeline.sh | bash -s -- \
+        -p scilus/sf-tractomics \
+        -r dev \
+        -o /scratch/${USER}/sf-tractomics-containers \
+        -c /scratch/${USER}/sf-tractomics-containers/cache \
+        -d <nb parallel downloads>
+      ```
+     </details>
+
+     <details>
+     <summary>Download with nf-core (advanced)</summary>
+     <Steps>
+        1. Install `nf-core` tools
+            `nf-core` tools is a nice Python package that provides utilities to interact with pipelines, such as downloading required containers destined for execution in offline settings. We suggest installing `nf-core` within a python virtual environment:
+            
+            ```bash
+            python -m virtualenv .venv
+            source .venv/bin/activate
+            pip install "nf-core>=3.5.2"
+            ```
+
+            For more details on how to install the package, please refer to the [official `nf-core` documentation](https://nf-co.re/docs/nf-core-tools/installation).
+
+        2. Validate your installation
+            <CommandOutputs>
+            <span slot="command">
+              ```bash
+              nf-core --version
+              ```
+            </span>
+
+            <span slot="output">
+              ```bash
+
+
+                                                    ,--./,-.
+                    ___     __   __   __   ___     /,-._.--~\ 
+              |\ | |__  __ /  ` /  \ |__) |__         }  {
+              | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                                    `._,._,'
+
+              nf-core/tools version 3.5.2 - https://nf-co.re
+
+              nf-core, version 3.5.2
+              ```
+            </span>
+            </CommandOutputs>
+        
+        3. Set environment variables to indicate to nf-core where to download the images:
+            ```bash
+            export APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers
+            export NXF_APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers/cache
+            export SINGULARITY_CACHEDIR=${APPTAINER_CACHEDIR}
+            export NXF_SINGULARITY_CACHEDIR=${NXF_APPTAINER_CACHEDIR}
+            ```
+        
+        4. Download the images
+
+            To see the command options, you can use the `nf-core pipelines download -h` command that will list all possible options. However, we suggest you use those parameters (`-r` is the pipeline version you want to download, and `-o` is the output directory):
+
+            <CommandOutputs>
+              <span slot="command">
+                ```bash
+                nf-core pipelines download scilus/sf-tractomics -r 0.1.0 -o ./containers/ -s singularity -l docker.io -u copy --force
+                ```
+              </span>
+
+              <span slot="output">
+                ```bash
+
+
+                                                      ,--./,-.
+                      ___     __   __   __   ___     /,-._.--~\
+                |\ | |__  __ /  ` /  \ |__) |__         }  {
+                | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                                      `._,._,'
+
+                nf-core/tools version 3.5.2 - https://nf-co.re
+
+                WARNING  Could not find GitHub authentication token. Some API requests may fail.
+                INFO     Detected Nextflow version 25.04.6
+
+                If transferring the downloaded files to another system, it can be convenient to have everything compressed in a single file.
+                This is not recommended when downloading Singularity images, as it can take a long time and saves very little space.
+                ? Choose compression type: none
+                WARNING  Deleting existing output directory: 'containers'
+                INFO     Saving 'scilus/sf-tractomics'
+                        Pipeline revision: 'dev'
+                        Use containers: 'singularity'
+                        Container library: 'docker.io'
+                        Using NXF_SINGULARITY_CACHEDIR': /scratch/agagnon/download/containers/'
+                        Output directory: 'containers'
+                        Include default institutional configuration: 'False'
+                INFO     Downloading workflow
+                INFO     Downloading workflow files from GitHub
+                ```
+              </span>
+            </CommandOutputs>
+      </Steps>
+     </details>
+
+     <Aside type="note">
+     Downloading all containers takes ~45-60 minutes depending on how much parallel download you selected and requires a fair amount of local disk space. To accelerate the download process, you can increase the number of parallel downloads.
+     </Aside>
+
+     Once the images are downloaded, `nextflow` needs to be told where to find those images in order to properly spawn the containers used in the pipeline. If not already set, you need to set the following environment variables (with the appropriate paths). **Those variables need to be available when running the pipeline so that nextflow knows where to find the downloaded images and avoids trying to pull them from the web**.
+     ```bash
+     export APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers
+     export NXF_APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers/cache
+     export SINGULARITY_CACHEDIR=${APPTAINER_CACHEDIR}
+     export NXF_SINGULARITY_CACHEDIR=${NXF_APPTAINER_CACHEDIR}
+     ```
+</Steps>
+
+## Troubleshooting
+If you encountered any issues during installation of this pipeline, refer to the [troubleshooting page](/sf-tractomics/user_guides/troubleshooting) or open an issue if your error is not covered. 
+
+## Next steps
+Once everything installed and/or available, you can proceed to the [inputs section](/sf-tractomics/user_guides/inputs).
