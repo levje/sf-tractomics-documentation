@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import Icons from 'unplugin-icons/vite';
-import starlightVersions from 'starlight-versions';
 import starlightThemeGalaxy from 'starlight-theme-galaxy';
 
 import tailwindcss from '@tailwindcss/vite';
