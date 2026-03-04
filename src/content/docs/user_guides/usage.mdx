@@ -42,13 +42,9 @@ This will launch the pipeline with the `docker` and the `full_pipeline` configur
 
   3. **`-profile`**: profile(s) to be run and container system to use
 
-     `sf-tractomics` processing steps was designed in profiles, giving users total control on which type of processing they want to make. One caveat is that users need to explicitly tell which profile to run. This is done via the `-profile` parameter.
+     This is a core `nextflow` argument. `sf-tractomics` processing steps was designed in profiles, giving users total control on which type of processing they want to make. One caveat is that users need to explicitly tell which profile to run. This is done via the `-profile` parameter.
      
      Multiple profiles can be specified at once by separating them with **only a comma and no whitespace** (important!). To choose the appropriate profile(s) for your needs, please see [this section](#choosing-a-profile).
-   
-      :::note
-      Notice that the prefix of the `-profile` command line parameter contains only a **single dash**. Parameters specified with a single dash are `nextflow` core parameters.
-      :::
 
   4. **`-with-report`**: Enables `nextflow` caching capabilities.
 
@@ -60,11 +56,9 @@ This will launch the pipeline with the `docker` and the `full_pipeline` configur
      the following run will start back where it left off. For more details, see the [core `nextflow` arguments section](#core-nextflow-arguments).
 </Steps>
 
-
-:::note
-More parameters can be tuned to your own usage, for a concise list of the most common parameters, you can run `nextflow run scilus/sf-tractomics -r 0.1.0 --help`.
-Otherwise, for the complete list of parameters, please refer to the [parameters section](/sf-tractomics/guides/parameters) of the documentation.
-:::
+<Aside type="note">
+   More parameters can be tuned to your own usage, for a concise list of the most common parameters, you can run `nextflow run scilus/sf-tractomics -r 0.1.0 --help`. Otherwise, for the complete list of parameters, please refer to the [parameters section](/sf-tractomics/user_guides/parameters) of the documentation.
+</Aside>
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -111,9 +105,9 @@ More than one profile can be used at the same time! For example, `-profile docke
 
      If selected, the SLURM job scheduler will be used to dispatch jobs. This is most commonly used when running pipelines on an HPC server.
 
-     :::note
-     When running with this profile and your compute nodes do not have internet access, we strongly recommend [installing the pipeline for offline use](/sf-tractomics/user_guides) if you haven't done so already.
-     :::
+     <Aside type="note">
+      When running with this profile and your compute nodes do not have internet access, we strongly recommend [installing the pipeline for offline use](/sf-tractomics/user_guides/installation#install-sf-tractomics-for-offline-use) if you haven't done so already.
+     </Aside>
 
   4. **`-profile arm`:**
 
@@ -139,9 +133,9 @@ More than one profile can be used at the same time! For example, `-profile docke
 
 ## **Core `nextflow` arguments**
 
-:::note
-These options are part of Nextflow and use a *single* hyphen (pipeline parameters use a double-hyphen).
-:::
+<Aside type="note">
+   These options are part of Nextflow and use a *single* hyphen (pipeline parameters use a double-hyphen).
+</Aside>
 
 ### **`-profile`**
 

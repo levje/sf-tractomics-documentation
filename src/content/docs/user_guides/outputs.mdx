@@ -4,7 +4,7 @@ description: sf-tractomics outputs
 ---
 
 import { FileTree } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths
 are relative to the top-level results directory (below `sf-tractomics-results` used as example). The pipeline outputs
@@ -44,10 +44,9 @@ The pipeline creates 2 folders: the result folder specified by the `--outdir` pa
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and data processing steps can be grouped. The final output files
 are listed below for each of those steps.
 
-:::note[Sidecar JSON files]
-In addition to the output files described below, you will also find **sidecar JSON file** for nifti volumes. Those will contain
-informations regarding their source (either raw or processed), the applied transforms, and/or processing steps.
-:::
+<Aside type="note" title="Sidecar JSON files">
+  In addition to the output files described below, you will also find **sidecar JSON file** for nifti volumes. Those will contain informations regarding their source (either raw or processed), the applied transforms, and/or processing steps.
+</Aside>
 
 * [Anatomy Preprocessing](#anatomy-preprocessing) - Preprocess T1w images (denoising, normalization, etc.)
 * [DWI Preprocessing](#dwi-preprocessing) - Preprocess DWI images (denoising, susceptibility correction, normalization, etc.)
