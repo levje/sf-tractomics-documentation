@@ -4,6 +4,7 @@ description: How to use sf-tractomics
 ---
 
 import CommandOutputs from '../../../components/CommandOutputs.astro';
+import TroubleshootingSection from '../../../components/TroubleshootingSection.astro';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { FileTree } from '@astrojs/starlight/components';
 import { Steps, Aside } from '@astrojs/starlight/components';
@@ -28,6 +29,18 @@ The typical command for running the pipeline locally is as follows:
 </Tabs>
 
 This will launch the pipeline with the `docker` and the `full_pipeline` configuration profiles, which automatically spawns docker containers when necessary and runs all the possible diffusion MRI processing steps respectively.
+
+<Aside type="caution">
+   If you're trying to run the pipeline running on an HPC cluster and you haven't downloaded and installed the containers to run the pipeline offline, we suggest doing so here before running the pipeline.
+
+   Once you have pre-installed the containers, do not forget to specify the following environment variables so that nextflow can appropriately find the installed containers/images.
+   ```bash
+   export APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers
+   export NXF_APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers/cache
+   export SINGULARITY_CACHEDIR=${APPTAINER_CACHEDIR}
+   export NXF_SINGULARITY_CACHEDIR=${NXF_APPTAINER_CACHEDIR}
+   ```
+</Aside>
 
 <Steps>
   1. **`--input`**: the path to your BIDS directory
@@ -192,6 +205,10 @@ Instead of specifying all your pipeline parameters one by one each time in the c
   </TabItem>
 </Tabs>
 
+<Aside type="note" title="Other parameters">
+   For an exhaustive list of parameters you can supply in this file, please consult [this page](/sf-tractomics/user_guides/parameters).
+</Aside>
+
 ### **`-c`**
 
 This specifies a path to a `nextflow configuration file`. This file differs from the previous `-params-file` argument since this allows to [tune process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories and published files) or module arguments (args). Beware that this way of customizing the pipeline's execution might require a more in-depth knowledge of the pipeline and it is very error-prone. The following example simply illustrates how to structure such a configuration:
@@ -215,12 +232,4 @@ nextflow run scilus/sf-tractomics -r <release_version> -c nextflow.config [...]
    Note that we discourage the use of the `-c` argument **to specify parameters for the pipeline**. Although possible to parametrize the pipeline this way, it can lead to unexpected errors. We suggest using the `-params-file` above when possible. See the [nf-core website documentation](https://nf-co.re/usage/configuration) for more information.
 </Aside>
 
-## **Reproducibility**
-
-We recommend tagging the appropriate version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the codebase since.
-
-First, go to the [scilus/sf-tractomics releases page](https://github.com/scilus/sf-tractomics/releases) and find the latest pipeline version - numeric only for a stable release (e.g. `0.1.0`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 0.1.0`. Of course, you can switch to another version by changing the number after the `-r` flag.
-
-This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, this version will be logged at the bottom of the final MultiQC reports.
-
-To further assist in reproducibility, you can use share and reuse [parameter files](#using-the-paramsyml-file) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
+<TroubleshootingSection />

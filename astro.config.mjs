@@ -32,6 +32,7 @@ export default defineConfig({
 						{ label: 'Running the pipeline', slug: 'user_guides/usage' },
 						{ label: "Parameters reference", slug: 'user_guides/parameters' },
 						{ label: 'Understand the outputs', slug: 'user_guides/outputs' },
+						{ label: 'Offline installation', slug: 'user_guides/offline' },
 						{ label: 'Troubleshooting', slug: 'user_guides/troubleshooting' },
 						{ label: 'Frequently Asked Questions', slug: 'user_guides/faq' },
 					],
