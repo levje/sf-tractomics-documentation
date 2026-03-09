@@ -130,19 +130,73 @@ More than one profile can be used at the same time! For example, `-profile docke
 
 **Processing profiles**:
 <Steps>
-   1. **`-profile gpu`**
+   1. **`-profile full_pipeline`**
+
+      Runs the full **sf-tractomics** pipeline from end-to-end, with all processing steps enabled.
+   2. **`-profile iit_tractometry`**
+
+      Preprocesses the inputs (denoising, registration, etc.), computes diffusion metric maps, freewater correction, NODDI for multi-shell subjects. This profile **avoids running tracking**. This profile registers the IIT White Matter bundle maps/masks to the subject space where it computes tractometry using those mean bundle maps (either binary masks or track-density images).
+   3. **`-profile gpu`**
 
       Activate usage of GPU accelerated algorithms to drastically increase processing speeds. Currently only
       supports CUDA (e.g. NVidia's GPU). Accelerations for **FSL Eddy** and **Local tractography** are automatically enabled
       using this profile. If you're encountering errors while using this profile, please refer to the [troubleshooting page](/sf-tractomics/user_guides/troubleshooting).
-
-   2. **`-profile full_pipeline`**
-
-      Runs the full **sf-tractomics** pipeline from end-to-end, with all processing steps enabled.
 </Steps>
 
 **Using either `-profile docker` or `-profile apptainer` is highly recommended, as it controls the version of the software used and ensure reproducibility.** While it is technically possible to run the pipeline without Docker or Apptainer, the amount of dependencies to install is simply not worth it.
 
+## **Key parameters**
+### **Shell selection for DTI and fODF models**
+
+By default, the pipeline assumes that:
+
+<Steps>
+   1. **B-values ≤ 1200 s/mm²** are used for DTI fitting.
+
+   2. **B-values ≥ 700 s/mm²** are used for fODF fitting.
+</Steps>
+
+If your data has different b-values, you **MUST** specify which shells to use, or the pipeline will likely fail. To do that, you can change the thresholds used for the DTI and fODF fitting by specifying the following parameters: `--max_dti_shell_value` and `--min_fodf_shell_value` depending on your use_case. For example, if your data has a protocol where the b-values tunder 1500 s/mm² should be used for DTI fitting (e.g. your protocol doesn't have b-values under 1200 s/mm²) and the b-values above 800 s/mm² should be used for fODF fitting, running the pipeline would look something like:
+```bash
+nextflow run scilus/sf-tractomics -r <release_version> \
+   --input <input_directory> \
+   --outdir ./results \
+   --max_dti_shell_value 1500 \
+   --min_fodf_shell_value 800 \
+   [...]
+```
+
+For more details, see the [parameters page](/sf-tractomics/user_guides/parameters/#dwi-processing-options).
+
+### **Include/exclude subjects**
+
+The pipeline will try to process all the subjects it can find within your [input BIDS folder](/sf-tractomics/user_guides/input). However, for many different reasons, you might not want to process all of your subjects.
+
+<Steps>
+   1. **Include subjects**: You might want to run the pipeline on a subset of your subjects (e.g. to test, or to process your data in many batches). You can specify the `--participant_label` parameter with a list of comma-separated subject labels. This will only run the pipeline on those subjects. For example, to only include the subjects "sub-02" and "sub-03", running the pipeline would look something like:
+      ```bash
+      nextflow run scilus/sf-tractomics -r <release_version> \
+         --input <input_directory> \
+         --outdir ./results \
+         --participant_label "sub-02,sub-03"
+         [...]
+      ```
+
+   2. **Exclude subjects**: If you already know that you will exclude subjects from your analysis, you can specify the `--exclude_participant_label` parameter with a list of comma-separated subject labels. This will avoid running the pipeline on those subjects. For example, to exclude the subjects "sub-01", "sub-04" and "sub-05", the command would look something like:
+      ```bash
+      nextflow run scilus/sf-tractomics -r <release_version> \
+         --input <input_directory> \
+         --outdir ./results \
+         --exclude_participant_label "sub-01,sub-04,sub-05"
+         [...]
+      ```
+</Steps>
+
+You **can also specify both parameters at the same time**. The inclusion of the subjects will be made first, followed by the exclusion. If a specified subject doesn't exist in the input dataset, it will simply be skipped.
+
+<Aside type="tip">
+   Even thought the given examples of the previous subsections are passing the parameters via the command line, we recommend specifying those parameters using the [`-params-file`](#-params-file) core nextflow argument ([detailed below](#-params-file)) to list all the parameters in a single file. This will increase reproducibility, readability and ease of use of your data processing using this pipeline.
+</Aside>
 
 ## **Core `nextflow` arguments**
 
@@ -180,12 +234,17 @@ Instead of specifying all your pipeline parameters one by one each time in the c
     ```yaml title="params.yaml"
     input: '<input_directory>/'
     outdir: './results/'
+    max_dti_shell_value: 1500
+    min_fodf_shell_value: 800
+    participant_label: "sub-02,sub-03"
     <...>
     ```
 
     And running the pipeline with:
     ```bash
-    nextflow run scilus/sf-tractomics -r <release_version> -params-file params.yaml [...]
+    nextflow run scilus/sf-tractomics -r <release_version> \
+      -params-file params.yaml \
+      [...]
     ```
   </TabItem>
   <TabItem label="JSON">
@@ -193,14 +252,18 @@ Instead of specifying all your pipeline parameters one by one each time in the c
     {
       "input": "<input_directory>/",
       "outdir": "./results/",
-      <...>
+      "max_dti_shell_value": 1500,
+      "min_fodf_shell_value": 800,
+      "participant_label": "sub-02,sub-03"
     }
     ```
 
     And running the pipeline with:
 
     ```bash
-    nextflow run scilus/sf-tractomics -r <release_version> -params-file params.json [...]
+    nextflow run scilus/sf-tractomics -r <release_version> \
+      -params-file params.json \
+      [...]
     ```
   </TabItem>
 </Tabs>
