@@ -135,7 +135,7 @@ More than one profile can be used at the same time! For example, `-profile docke
       Runs the full **sf-tractomics** pipeline from end-to-end, with all processing steps enabled.
    2. **`-profile iit_tractometry`**
 
-      Preprocesses the inputs (denoising, registration, etc.), computes diffusion metric maps, freewater correction, NODDI for multi-shell subjects. This profile **avoids running tracking**. This profile registers the IIT White Matter bundle maps/masks to the subject space where it computes tractometry using those mean bundle maps (either binary masks or track-density images).
+      Preprocesses the inputs (denoising, registration, etc.), computes diffusion metric maps, freewater correction and NODDI for multi-shell subjects. This profile performs tractometry **without tracking**. It registers the bundle definitions (i.e. TDI maps or binary masks) from the IIT White Matter Atlas to the subject space to perform tractometry.
    3. **`-profile gpu`**
 
       Activate usage of GPU accelerated algorithms to drastically increase processing speeds. Currently only
