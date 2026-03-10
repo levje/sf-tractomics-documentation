@@ -1,20 +1,25 @@
 ---
-title: How to run sf-tractomics?
-description: Installation 
+title: Installation
+description: Install the pipeline
+tableOfContents: false
 ---
 
 import { Steps } from '@astrojs/starlight/components';
 import CommandOutputs from '../../../components/CommandOutputs.astro';
+import TroubleshootingSection from '../../../components/TroubleshootingSection.astro';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
-### **Prerequisites**
+`sf-tractomics` integrates **a lot** of different tools together. To orchestrate the tools into a comprehensible and useful pipeline, we use third-party software that allow easy and efficient parallelization of tasks across subjects. Installing the prerequisite softwares below are the only things you'll need to install to be able to operate the entire pipeline.
 
-While you do not need to install every software used within `sf-tractomics`, there is two core dependencies that need to be available at runtime:
+## Prerequisites
+
+While you do not need to install every software used within `sf-tractomics`, there are two core dependencies that need to be available at runtime:
 
 <Steps>
-  1. **Nextflow (>= 24.10.5)**
+  1. **Nextflow (>= 25.04.6)**
 
-     To install the `nextflow` executable, please refer to the [official `nextflow` documentation](https://www.nextflow.io/docs/latest/install.html). While `sf-tractomics` has a minimal `nextflow` version, it is always tested against the latest version available (and oldest), so you can go ahead and install the latest version available. If you plan on running the pipeline on an HPC server, you might want to validate it is not already installed by your server's admins.
+     To install the `nextflow` executable, please refer to the [official nextflow documentation](https://www.nextflow.io/docs/latest/install.html). While `sf-tractomics` has a minimal `nextflow` version, it is always tested against the latest version available, so you can go ahead and install the latest version available. If you plan on running the pipeline on an HPC server, you might want to validate it is not already installed by your server's admins.
 
      **To validate `nextflow` is installed, you can run the following command:**
 
@@ -30,21 +35,21 @@ While you do not need to install every software used within `sf-tractomics`, the
          (english, french, italian, spanish) !
 
          ```bash
-         N E X T F L O W   ~  version 24.10.4
+          N E X T F L O W   ~  version 25.04.6
 
-         Pulling nextflow-io/helloworld ...
-         downloaded from https://github.com/nextflow-io/hello.git
-         Launching `https://github.com/nextflow-io/helloworld` [disturbed_mahavira] DSL2 - revision: afff16a9b4 [master]
+          Pulling nextflow-io/helloworld ...
+          downloaded from https://github.com/nextflow-io/hello.git
+          Launching `https://github.com/nextflow-io/helloworld` [special_newton] DSL2 - revision: d828daeef7 [master]
 
-         executor >  local (4)
-         [59/71fa40] process > sayHello (4) [100%] 4 of 4 ✔
-         Bonjour world!
+          executor >  local (4)
+          [cf/67aeba] sayHello (1) [100%] 4 of 4 ✔
+          Ciao world!
 
-         Hello world!
+          Hola world!
 
-         Ciao world!
+          Bonjour world!
 
-         Hola world!
+          Hello world!
          ```
        </span>
      </CommandOutputs>
@@ -179,95 +184,14 @@ While you do not need to install every software used within `sf-tractomics`, the
           </CommandOutputs>
      </Steps>
 </Steps>
-### **Install sf-tractomics**
-     <Steps>
-       1. **Release**
 
-          Download sf-tractomics pipeline:
-          <CommandOutputs>
-            <span slot="command">
-              ```bash
-              nextflow pull scilus/sf-tractomics -r main
-              nextflow run sf-tractomics/main.nf -r main --help
-              ```
-            </span>
-
-            <span slot="output">
-              ```bash
-              Downloading plugin nf-schema@2.4.2
-              Launching `https://github.com/scilus/sf-tractomics` [crazy_marconi] DSL2 - revision: ac50d4b1c5 [main]
-
-              Uses GPU: false
-              You must provide an input directory containing all images using:
-                      --input=/path/to/[input]             Input directory containing your subjects
-                                      [input]
-                                        ├-- S1
-                                        |   ├-- *dwi.nii.gz
-                                        |   ├-- *dwi.bval
-                                        |   └-- *dwi.bvec
-                                        └-- S2
-                                              ├-- *dwi.nii.gz
-                                              ├-- *dwi.bval
-                                              └-- *dwi.bvec
-              Please resubmit your command with the previous file structure.
-              ```
-            </span>
-          </CommandOutputs>
-
-       2. **For developers**
-          
-          Clone sf-tractomics pipeline repository:
-
-          <details markdown="1">
-          <summary>Clone with HTTPS</summary>
-          <Tabs>
-            <TabItem label="Command">
-              ```bash
-             git clone https://github.com/scilus/sf-tractomics.git
-              ```
-            </TabItem>
-          </Tabs>
-          </details>
-
-          <details markdown="1">
-          <summary>Clone with SSH</summary>
-          <Tabs>
-            <TabItem label="Command">
-              ```bash
-             git clone git@github.com:scilus/sf-tractomics.git
-              ```
-            </TabItem>
-          </Tabs>
-          </details>
-          
-          <CommandOutputs>
-            <span slot="command">
-              ```bash
-              nextflow run sf-tractomics/main.nf --help
-              ```
-            </span>
-
-            <span slot="output">
-              ```bash
-              Launching `s/sf-tractomics/main.nf` [crazy_marconi] DSL2 - revision: ac50d4b1c5
-
-              Uses GPU: false
-              You must provide an input directory containing all images using:
-                      --input=/path/to/[input]             Input directory containing your subjects
-                                      [input]
-                                        ├-- S1
-                                        |   ├-- *dwi.nii.gz
-                                        |   ├-- *dwi.bval
-                                        |   └-- *dwi.bvec
-                                        └-- S2
-                                              ├-- *dwi.nii.gz
-                                              ├-- *dwi.bval
-                                              └-- *dwi.bvec
-              Please resubmit your command with the previous file structure.
-              ```
-            </span>
-          </CommandOutputs>
-     </Steps>
+<Aside type="note" title="Running on a HPC cluster">
+  If you are planning on running the pipeline on a HPC server where compute nodes do not have internet access, a few more installation steps might be required (e.g. pre-downloading the apptainer images used by the pipeline) to ensure the pipeline can be ran properly. Please consult [this section to setup your environment for offline usage](/sf-tractomics/user_guides/offline).
+</Aside>
 
 
-Once everything installed and/or available, you can proceed to the [inputs section](/sf-tractomics/0.1.0/guides/inputs).
+
+<TroubleshootingSection />
+
+## Next steps
+Once everything installed and/or available, you should be well equiped to run the pipeline easily. You can now proceed to the next section where we detail how you should format your inputs before we detail how to properly run the pipeline.

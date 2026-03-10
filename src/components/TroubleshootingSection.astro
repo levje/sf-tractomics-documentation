@@ -1,0 +1,18 @@
+---
+interface Props {
+	heading?: string;
+	troubleshootingUrl?: string;
+}
+
+const {
+	heading = 'Troubleshooting',
+	troubleshootingUrl = '/sf-tractomics/user_guides/troubleshooting',
+} = Astro.props;
+---
+
+<h2>{heading}</h2>
+<p>
+	If you encountered any issues when following the steps detailed in this page, refer to the{' '}
+	<a href={troubleshootingUrl}>troubleshooting page</a> or <a href="https://github.com/scilus/sf-tractomics/issues">open an issue</a> if your error is not
+	covered (yet).
+</p>

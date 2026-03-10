@@ -1,0 +1,152 @@
+---
+title: Offline installation
+description: Steps to install sf-tractomics on compute nodes without internet access.
+next:
+    label: "Preparing your inputs"
+    link: "/sf-tractomics/inputs"
+prev:
+    label: "Installation"
+    link: "/sf-tractomics/installation"
+tableOfContents: false
+---
+
+import CommandOutputs from '../../../components/CommandOutputs.astro';
+import TroubleshootingSection from '../../../components/TroubleshootingSection.astro';
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+
+Some computing nodes on HPC clusters does not have access to internet at runtime. Since the pipeline interacts with the containers repository and pull during execution, it won’t work if the compute nodes do not have access to the internet. Fortunately, containers can be downloaded prior to the pipeline execution, and fetch locally during runtime. Here are a few steps to perform to get all of that working quickly:
+
+<Steps>
+  1. **(Recommended)** Point the `NXF_HOME` environment variable in your work/scratch directory. When pulling or running a pipeline, the source files required to run the pipeline will be automatically cloned and fetched in the location pointed by the `NXF_HOME` variable.
+     ```bash
+     export NXF_HOME=/scratch/${USER}/.nextflow
+     ```
+  2. Create a directory where to host your apptainer images and a cache directory. For example:
+     ```bash
+     mkdir /scratch/${USER}/sf-tractomics-containers
+     mkdir /scratch/${USER}/sf-tractomics-containers/cache
+     ```
+     **Feel free to change the directories location to fit your needs.** The following steps will use these paths as a reference.
+  3. Download the apptainer images
+     <Aside type="caution">
+      In order for the download command to work, `nextflow` and `apptainer`/`singularity` need to be available on PATH.
+     </Aside>
+     <details open>
+     <summary>Download with script</summary>
+     ```bash
+      curl -fsSL https://raw.githubusercontent.com/nf-neuro/modules/refs/heads/main/assets/download_pipeline.sh | bash -s -- \
+        -p scilus/sf-tractomics \
+        -r dev \
+        -o /scratch/${USER}/sf-tractomics-containers \
+        -c /scratch/${USER}/sf-tractomics-containers/cache \
+        -d 4
+      ```
+     </details>
+
+     <details>
+     <summary>Download with nf-core (advanced)</summary>
+     <Steps>
+        1. Install `nf-core` tools
+            `nf-core` tools is a nice Python package that provides utilities to interact with pipelines, such as downloading required containers destined for execution in offline settings. We suggest installing `nf-core` within a python virtual environment:
+            
+            ```bash
+            python -m virtualenv .venv
+            source .venv/bin/activate
+            pip install "nf-core>=3.5.2"
+            ```
+
+            For more details on how to install the package, please refer to the [official `nf-core` documentation](https://nf-co.re/docs/nf-core-tools/installation).
+
+        2. Validate your installation
+            <CommandOutputs>
+            <span slot="command">
+              ```bash
+              nf-core --version
+              ```
+            </span>
+
+            <span slot="output">
+              ```bash
+
+
+                                                    ,--./,-.
+                    ___     __   __   __   ___     /,-._.--~\ 
+              |\ | |__  __ /  ` /  \ |__) |__         }  {
+              | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                                    `._,._,'
+
+              nf-core/tools version 3.5.2 - https://nf-co.re
+
+              nf-core, version 3.5.2
+              ```
+            </span>
+            </CommandOutputs>
+        
+        3. Set environment variables to indicate to nf-core where to download the images:
+            ```bash
+            export APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers
+            export NXF_APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers/cache
+            export SINGULARITY_CACHEDIR=${APPTAINER_CACHEDIR}
+            export NXF_SINGULARITY_CACHEDIR=${NXF_APPTAINER_CACHEDIR}
+            ```
+        
+        4. Download the images
+
+            To see the command options, you can use the `nf-core pipelines download -h` command that will list all possible options. However, we suggest you use those parameters (`-r` is the pipeline version you want to download, and `-o` is the output directory):
+
+            <CommandOutputs>
+              <span slot="command">
+                ```bash
+                nf-core pipelines download scilus/sf-tractomics -r 0.1.0 -o ./containers/ -s singularity -l docker.io -u copy --force
+                ```
+              </span>
+
+              <span slot="output">
+                ```bash
+
+
+                                                      ,--./,-.
+                      ___     __   __   __   ___     /,-._.--~\
+                |\ | |__  __ /  ` /  \ |__) |__         }  {
+                | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                                      `._,._,'
+
+                nf-core/tools version 3.5.2 - https://nf-co.re
+
+                WARNING  Could not find GitHub authentication token. Some API requests may fail.
+                INFO     Detected Nextflow version 25.04.6
+
+                If transferring the downloaded files to another system, it can be convenient to have everything compressed in a single file.
+                This is not recommended when downloading Singularity images, as it can take a long time and saves very little space.
+                ? Choose compression type: none
+                WARNING  Deleting existing output directory: 'containers'
+                INFO     Saving 'scilus/sf-tractomics'
+                        Pipeline revision: 'dev'
+                        Use containers: 'singularity'
+                        Container library: 'docker.io'
+                        Using NXF_SINGULARITY_CACHEDIR': /scratch/agagnon/download/containers/'
+                        Output directory: 'containers'
+                        Include default institutional configuration: 'False'
+                INFO     Downloading workflow
+                INFO     Downloading workflow files from GitHub
+                ```
+              </span>
+            </CommandOutputs>
+      </Steps>
+     </details>
+
+     <Aside type="tip">
+     Downloading all containers takes ~45-60 minutes depending on how much parallel download you selected and requires a fair amount of local disk space. To accelerate the download process, you can increase the number of parallel downloads.
+     </Aside>
+
+     Once the images are downloaded, `nextflow` needs to be told where to find those images in order to properly spawn the containers used in the pipeline. If not already set, you need to set the following environment variables (with the appropriate paths). **Those variables need to be available when running the pipeline so that nextflow knows where to find the downloaded images and avoids trying to pull them from the web**.
+     ```bash
+     export APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers
+     export NXF_APPTAINER_CACHEDIR=/scratch/${USER}/sf-tractomics-containers/cache
+     export SINGULARITY_CACHEDIR=${APPTAINER_CACHEDIR}
+     export NXF_SINGULARITY_CACHEDIR=${NXF_APPTAINER_CACHEDIR}
+     ```
+</Steps>
+
+<TroubleshootingSection />

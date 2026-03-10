@@ -5,15 +5,17 @@ description: sf-tractomics inputs
 
 import { FileTree } from '@astrojs/starlight/components';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
 ### Default input format - BIDS
 
-`sf-tractomics` input folder must follow a valid [BIDS](https://bids-specification.readthedocs.io/en/stable/) format,
-that minimally contains **diffusion** (**dwi**) and **T1-weighted** (**T1w**) MRI acquisitions :
+`sf-tractomics` input folder must follow a valid [BIDS](https://bids-specification.readthedocs.io/en/stable/) format, that minimally contains **diffusion** (**dwi**) and **T1-weighted** (**T1w**) MRI acquisitions:
 
 <FileTree>
   * input\_bids\_directory
     * dataset_description.json
+    * participants.json
+    * participants.tsv
     * sub-01
       * dwi
         * sub-01\_dwi.nii.gz
@@ -33,6 +35,37 @@ that minimally contains **diffusion** (**dwi**) and **T1-weighted** (**T1w**) MR
         * sub-02\_T1w.nii.gz
         * sub-02\_T1w.json
 </FileTree>
+
+<Aside type="tip">
+  The [BIDS](https://bids-specification.readthedocs.io/en/stable/) specification is quite exhaustive which might be hard to digest for a new user. If you need to convert and structure your data in the BIDS structure, we suggest using a tool such as [dcm2bids](https://unfmontreal.github.io/Dcm2Bids/3.2.0/) to assist you in converting and structuring your data efficiently. If you want to avoid structuring your data this way, please see the section below where you can input a custom spreadsheet that specifies to the pipeline where to find the data.
+</Aside>
+
+#### participants.tsv
+
+The participants.tsv file is not required for most modules of the pipeline. However, if you're planning on performing harmonization (e.g. using ClinicalCombat) you should provide a `participants.tsv` file listing different covariates for each subject, session and acquisition run. Also, even if no harmonization is being done and you're performing tractometry, you could also supply this file to carry the covariates along with your tractometry results. The `participants.tsv` file should contain a particular structure. **Minimally**, the `participants.tsv` should contain the following columns (it can also contain more columns):
+
+| participant_label | session | run | site | age | sex | handedness | disease |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| sub-001 | 1 |  | Sherbrooke | 78 | 2 | 1 | HC |
+| sub-001 | 2 |  | Sherbrooke | 78 | 2 | 1 | HC |
+| sub-002 | 1 |  | Sherbrooke | 81 | 2 | 2 | HC |
+| sub-002 | 2 |  | Sherbrooke | 81 | 2 | 2 | HC |
+
+<Aside type="note">
+	Please note that the expected format is a **T**ab-**S**eperated **V**alues (TSV) file. It is important that each column is separated by tabulations (i.e. `\t`) and not **spaces**.
+</Aside>
+
+Notice in the example above that even for an optional column that doesn't have any values, the column header still is represented and the values for that column are simply empty.
+- **participant_label**: The participant's ID prepended with "sub-".
+- **session** (*optional*): The participant's acquisition session ID (without the `ses-` prefix). If no session is provided, leave empty.
+- **run** (*optional*): The participant's acquisition run ID (without the `run-` prefix). If no run is provided, leave empty.
+- **site**: Acquisition site name.
+- **age**: Age (in years) of the participant.
+- **sex**: Sex of the participant. 1 for male, 2 for female.
+- **handedness** (*optional*): Handedness of the participant. 1 for right, 2 for left.
+- **disease**: Whether the participant is affected by a disease. Use minimally "HC" for healthy controls.
+
+Although completely optional and in line with the [BIDS specification](https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files/data-summary-files.html#participants-file), we recommend having a `participants.json` which briefly details the meaning of each column of the `participants.tsv` file. For more details, consult this [section of the specification](https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files/data-summary-files.html#participants-file). 
 
 ### Perform Motion and Eddy currents correction
 
@@ -77,10 +110,9 @@ entity. The same is expected for the main diffusion volume as well (**AP** and *
 
 <TabItem label="Reverse DWI">
 
-:::caution[Gradient protocols must fit !]
-The correction only works if you provide the **exact same gradient protocol** for both DWI
-volumes
-:::
+<Aside type="caution" title="Gradient protocols must fit!">
+  The correction only works if you provide the **exact same gradient protocol** for both DWI volumes.
+</Aside>
 
 <FileTree>
   * input\_bids\_directory

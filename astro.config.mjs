@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import Icons from 'unplugin-icons/vite';
 import starlightVersions from 'starlight-versions';
+// import starlightThemeGalaxy from 'starlight-theme-galaxy';
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -14,6 +15,7 @@ export default defineConfig({
 		starlight({
 			title: 'sf-tractomics',
 			plugins: [
+				// starlightThemeGalaxy()
 				// starlightVersions({
 				// 	versions: [ ],
 				// }),
@@ -26,16 +28,17 @@ export default defineConfig({
 			social: [{ icon: 'github', label: 'sf-tractomics', href: 'https://github.com/scilus/sf-tractomics' }],
 			sidebar: [
 				{
-					label: 'Guides',
+					label: 'User Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'How to run the pipeline?', slug: 'guides/installation' },
-						{ label: 'Inputs', slug: 'guides/inputs' },
-						{ label: 'Running the pipeline', slug: 'guides/usage' },
-						{ label: 'Running with no internet access', slug: 'guides/nointernet' },
-						{ label: "Parameters", slug: 'guides/parameters' },
-						{ label: 'Outputs', slug: 'guides/outputs' },
-						{ label: 'Frequently Asked Questions', slug: 'guides/faq' },
+						{ label: 'Installation', slug: 'user_guides/installation' },
+						{ label: 'Prepare your input data', slug: 'user_guides/inputs' },
+						{ label: 'Running the pipeline', slug: 'user_guides/usage' },
+						{ label: "Parameters reference", slug: 'user_guides/parameters' },
+						{ label: 'Understand the outputs', slug: 'user_guides/outputs' },
+						{ label: 'Offline installation', slug: 'user_guides/offline' },
+						{ label: 'Troubleshooting', slug: 'user_guides/troubleshooting' },
+						{ label: 'Frequently Asked Questions', slug: 'user_guides/faq' },
 					],
 				},
 				{
