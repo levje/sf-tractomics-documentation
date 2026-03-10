@@ -31,7 +31,7 @@ The typical command for running the pipeline locally is as follows:
 This will launch the pipeline with the `docker` and the `full_pipeline` configuration profiles, which automatically spawns docker containers when necessary and runs all the possible diffusion MRI processing steps respectively.
 
 <Aside type="caution">
-   If you're trying to run the pipeline running on an HPC cluster and you haven't downloaded and installed the containers to run the pipeline offline, we suggest doing so here before running the pipeline.
+   If you're trying to run the pipeline running on an HPC cluster and you haven't downloaded and installed the containers to run the pipeline offline, we suggest doing so here before running the pipeline [as detailed here](/sf-tractomics/user_guides/offline).
 
    Once you have pre-installed the containers, do not forget to specify the following environment variables so that nextflow can appropriately find the installed containers/images.
    ```bash
@@ -86,7 +86,7 @@ Note that the pipeline will create the following files in your working directory
         * anat/                     # Clean T1w in diffusion space
         * dwi/                      # All clean DWI files, models, tractograms, ...
           * bundles/                # Extracted bundles when using bundling
-      * xfm/                        # Transforms between diffusion and anatomy
+        * xfm/                        # Transforms between diffusion and anatomy
   * ...                             # Other nextflow related files
 </FileTree>
 
@@ -156,7 +156,7 @@ By default, the pipeline assumes that:
    2. **B-values ≥ 700 s/mm²** are used for fODF fitting.
 </Steps>
 
-If your data has different b-values, you **MUST** specify which shells to use, or the pipeline will likely fail. To do that, you can change the thresholds used for the DTI and fODF fitting by specifying the following parameters: `--max_dti_shell_value` and `--min_fodf_shell_value` depending on your use_case. For example, if your data has a protocol where the b-values tunder 1500 s/mm² should be used for DTI fitting (e.g. your protocol doesn't have b-values under 1200 s/mm²) and the b-values above 800 s/mm² should be used for fODF fitting, running the pipeline would look something like:
+If your data has different b-values, you **MUST** specify which shells to use, or the pipeline will likely fail. To do that, you can change the thresholds used for the DTI and fODF fitting by specifying the following parameters: `--max_dti_shell_value` and `--min_fodf_shell_value` depending on your use case. For example, if your data has a protocol where the b-values under 1500 s/mm² should be used for DTI fitting (e.g. your protocol doesn't have b-values under 1200 s/mm²) and the b-values above 800 s/mm² should be used for fODF fitting, running the pipeline would look something like:
 ```bash
 nextflow run scilus/sf-tractomics -r <release_version> \
    --input <input_directory> \

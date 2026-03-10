@@ -21,7 +21,7 @@ export NXF_OPTS="-XX:ActiveProcessorCount=<desired_cpu_count> -Xmx2g
 ```
 
 <Aside>
-You might encounter this error because you're trying to start the pipeline directly from a compute node which we recommend avoiding. We instead recommend to run the pipeline directly from a login node. The `slurm` executor should take care of automatically submitting the jobs on the cluster with appropriate resources allocations. Please refer to [this section](/sf-tractomics/user_guides/nointernet) to learn more about running the pipeline with the SLURM executor.
+You might encounter this error because you're trying to start the pipeline directly from a compute node which we recommend avoiding. We instead recommend to run the pipeline directly from a login node. The `slurm` executor should take care of automatically submitting the jobs on the cluster with appropriate resources allocations. Please refer to [this section](/sf-tractomics/user_guides/usage/#choosing-a-profile) to learn more about running the pipeline with the SLURM executor (using `-profile slurm`).
 </Aside>
 
 
